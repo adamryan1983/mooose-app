@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:mooose/tab_navigation_items.dart';
-import 'package:mooose/constants/colors.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import './subpages/map.dart';
-import 'package:get/get.dart';
-import './controllers/dataController.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
+import 'package:mooose/constants/colors.dart';
+import 'package:mooose/tab_navigation_items.dart';
+import 'package:provider/provider.dart';
+
+import './controllers/dataController.dart';
+import './subpages/map.dart';
+import 'models/user_location.dart';
 
 class TabsPage extends StatefulWidget {
   @override
@@ -15,23 +18,25 @@ class TabsPage extends StatefulWidget {
 class _TabsPageState extends State<TabsPage> {
   int _currentIndex = 0;
   Position? _currentPosition;
+  
 
-  _getCurrentLocation() async {
-    await Geolocator.getCurrentPosition(
-            desiredAccuracy: LocationAccuracy.best,
-            forceAndroidLocationManager: true)
-        .then((Position position) {
-      setState(() {
-        _currentPosition = position;
-      });
-    }).catchError((e) {
-      print(e);
-    });
-  }
+  // _getCurrentLocation() async {
+  //   await Geolocator.getCurrentPosition(
+  //           desiredAccuracy: LocationAccuracy.best,
+  //           forceAndroidLocationManager: true)
+  //       .then((Position position) {
+  //     setState(() {
+  //       _currentPosition = position;
+  //     });
+  //   }).catchError((e) {
+  //     print(e);
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
     final SightingsController sights = Get.find();
+    var userLocation = Provider.of<UserLocation>(context);
 
     return Scaffold(
       body: IndexedStack(
@@ -59,7 +64,7 @@ class _TabsPageState extends State<TabsPage> {
       floatingActionButton: SpeedDial(
         icon: Icons.add,
         activeIcon: Icons.remove,
-        buttonSize: 60.0,
+        buttonSize: Size(60.0,60.0),
         visible: true,
         closeManually: false,
 
@@ -85,15 +90,26 @@ class _TabsPageState extends State<TabsPage> {
               Get.to(() => MapDisplay());
             },
           ),
+          // Old way of doing it
+          // SpeedDialChild(
+          //   child: Icon(Icons.update_outlined),
+          //   backgroundColor: AppColors.PRIMARY_COLOR,
+          //   label: 'Report Moose Sighting',
+          //   labelStyle: TextStyle(fontSize: 18.0),
+          //   onTap: () async {
+          //     await _getCurrentLocation();
+          //     sights.recordSighting(
+          //         _currentPosition!.latitude, _currentPosition!.longitude);
+          //   },
+          // ),
           SpeedDialChild(
-            child: Icon(Icons.update_outlined),
+            child: Icon(Icons.upgrade_outlined),
             backgroundColor: AppColors.PRIMARY_COLOR,
-            label: 'Report Moose Sighting',
+            label: 'Report Moose Sighting Provider',
             labelStyle: TextStyle(fontSize: 18.0),
-            onTap: () async {
-              await _getCurrentLocation();
+            onTap: () {
               sights.recordSighting(
-                  _currentPosition!.latitude, _currentPosition!.longitude);
+                  userLocation.latitude!, userLocation.longitude!);
             },
           ),
         ],

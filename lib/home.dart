@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mooose/constants/colors.dart';
 import 'package:get/get.dart';
+import 'package:mooose/constants/colors.dart';
 import 'package:mooose/controllers/mooseSightingsController.dart';
 
 class HomePage extends GetWidget {
@@ -21,12 +21,10 @@ class HomePage extends GetWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(child: Image.asset('assets/images/mooose-logo.png')),
-
             Text(
               'Sightings in last 24 hours:',
               style: TextStyle(fontSize: 22),
             ),
-            // context.read(sightingsDailyProvider),
             Obx(() => Text(
                   "${sight.allSights.length}",
                   style: TextStyle(

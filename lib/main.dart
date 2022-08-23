@@ -1,11 +1,15 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:mooose/constants/colors.dart';
 import 'package:mooose/controllers/mooseSightingsController.dart';
-import './tabs.dart';
-import 'package:firebase_core/firebase_core.dart';
-import './error.dart';
-import 'package:get/get.dart';
+import 'package:provider/provider.dart';
+
 import './controllers/dataController.dart';
+import './error.dart';
+import './models/user_location.dart';
+import './tabs.dart';
+import 'services/location_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,9 +24,15 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final SightingsController sightings = Get.put(SightingsController());
     final MooseSightingsController mooseSightings =
-        Get.put(MooseSightingsController());
+      Get.put(MooseSightingsController());
 
-    return GetMaterialApp(
+    return StreamProvider<UserLocation>(
+      create: (_) => LocationService().locationStream,
+      initialData: UserLocation(
+        latitude: 0,
+        longitude: 0,
+      ),
+      child: GetMaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Mooose!',
         theme: ThemeData(
@@ -30,7 +40,18 @@ class MainApp extends StatelessWidget {
             fontFamily: 'Work',
             backgroundColor: AppColors.MAINBGWHITE,
             primaryColor: AppColors.SECONDARY_COLOR),
-        home: TabsPage());
+        home: TabsPage()
+      )
+    );
+    // return GetMaterialApp(
+    //     debugShowCheckedModeBanner: false,
+    //     title: 'Mooose!',
+    //     theme: ThemeData(
+    //         primarySwatch: Colors.red,
+    //         fontFamily: 'Work',
+    //         backgroundColor: AppColors.MAINBGWHITE,
+    //         primaryColor: AppColors.SECONDARY_COLOR),
+    //     home: TabsPage());
   }
 }
 

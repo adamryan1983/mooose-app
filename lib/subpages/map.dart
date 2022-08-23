@@ -1,14 +1,16 @@
 import 'dart:async';
 import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:geolocator/geolocator.dart' as geo;
+import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mooose/constants/colors.dart';
-import 'package:get/get.dart';
-import 'package:geolocator/geolocator.dart' as geo;
 import 'package:mooose/controllers/mooseSightingsController.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:mooose/services/geoService.dart';
+// import 'package:flutter/services.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class MapDisplay extends StatefulWidget {
   @override
@@ -53,12 +55,35 @@ class _MapState extends State<MapDisplay> {
   }
 
   void initState() {
+    _getLocationPermission();
     _getCurrentLocation();
     getMarker();
     geoService.getCurrentLocation().listen((position) {
       centerScreen(position);
     });
     super.initState();
+  }
+
+  Future<void> _getLocationPermission() async {
+    if (await Permission.location.serviceStatus.isEnabled) {
+      print('Location permission enabled');
+      var status = await Permission.location.request();
+      if (status.isGranted) {
+        print('Location permission granted');
+      } else if (status.isDenied) {
+        print('Location permission denied');
+        Map<Permission, PermissionStatus> status = await [
+          Permission.location,
+        ].request();
+      }
+      else if (status.isPermanentlyDenied) {
+        print('Location permission permanently denied');
+        openAppSettings();
+      }
+    }
+    else {
+      print('Location permission not enabled');
+    }
   }
 
   late geo.LocationSettings locationSettings;
