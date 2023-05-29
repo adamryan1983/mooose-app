@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:geolocator/geolocator.dart' as geo;
 import 'package:get/get.dart';
@@ -12,6 +14,8 @@ import 'package:mooose/services/geoService.dart';
 // import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../models/marked_sighting.dart';
+
 class MapDisplay extends StatefulWidget {
   @override
   State createState() => _MapState();
@@ -19,6 +23,7 @@ class MapDisplay extends StatefulWidget {
 
 class _MapState extends State<MapDisplay> {
   final MooseSightingsController sight = Get.find();
+
   final GeolocatorService geoService = GeolocatorService();
   geo.Position? position;
   Widget _child = SpinKitRipple(
@@ -90,8 +95,31 @@ class _MapState extends State<MapDisplay> {
 
   Future<Uint8List> getMarker() async {
     ByteData byteData =
-        await DefaultAssetBundle.of(context).load("assets/images/car_icon.png");
+      await DefaultAssetBundle.of(context).load("assets/images/car_icon.png");
     return byteData.buffer.asUint8List();
+  }
+
+  Future<Uint8List> getBytesFromAsset(String path, int width) async {
+    ByteData data = await rootBundle.load(path);
+    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(), targetWidth: width);
+    ui.FrameInfo fi = await codec.getNextFrame();
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
+  }
+
+  Future<Set<Marker>> getMarkers() async {
+    Set<Marker> markers = Set();
+    for (MarkedSighting sighting in sight.allSightPositions) {
+      markers.add(Marker(
+        markerId: MarkerId(sighting.id!),
+        position: LatLng(sighting.latitude!, sighting.longitude!),
+        infoWindow: InfoWindow(
+          title: sighting.id,
+          snippet: sighting.blurb,
+        ),
+        icon: BitmapDescriptor.fromBytes(await getBytesFromAsset("assets/images/car_icon.png", 100)),
+      ));
+    }
+    return markers;
   }
 
   @override

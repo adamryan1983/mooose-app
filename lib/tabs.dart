@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:mooose/constants/colors.dart';
+import 'package:mooose/subpages/map2.dart';
 import 'package:mooose/tab_navigation_items.dart';
 import 'package:provider/provider.dart';
 
 import './controllers/dataController.dart';
-import './subpages/map.dart';
 import 'models/user_location.dart';
 
 class TabsPage extends StatefulWidget {
@@ -17,21 +16,6 @@ class TabsPage extends StatefulWidget {
 
 class _TabsPageState extends State<TabsPage> {
   int _currentIndex = 0;
-  Position? _currentPosition;
-  
-
-  // _getCurrentLocation() async {
-  //   await Geolocator.getCurrentPosition(
-  //           desiredAccuracy: LocationAccuracy.best,
-  //           forceAndroidLocationManager: true)
-  //       .then((Position position) {
-  //     setState(() {
-  //       _currentPosition = position;
-  //     });
-  //   }).catchError((e) {
-  //     print(e);
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +71,8 @@ class _TabsPageState extends State<TabsPage> {
             label: 'View Map',
             labelStyle: TextStyle(fontSize: 18.0),
             onTap: () {
-              Get.to(() => MapDisplay());
+              // Get.to(() => MapDisplay());
+              Get.to(() => Map2());
             },
           ),
           // Old way of doing it
@@ -103,9 +88,9 @@ class _TabsPageState extends State<TabsPage> {
           //   },
           // ),
           SpeedDialChild(
-            child: Icon(Icons.upgrade_outlined),
+            child: Icon(Icons.add_circle_outline_rounded),
             backgroundColor: AppColors.PRIMARY_COLOR,
-            label: 'Report Moose Sighting Provider',
+            label: 'Report Moose Sighting',
             labelStyle: TextStyle(fontSize: 18.0),
             onTap: () {
               sights.recordSighting(
